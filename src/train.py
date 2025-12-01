@@ -1,13 +1,15 @@
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 import pandas as pd
 import numpy as np
-import os
 import argparse
 from preprocessing import load_data, preprocess_data
 from models import ModelTrainer
 from sklearn.model_selection import train_test_split
 
 # Configuration
-DATA_PATH = '../data/dataset.csv'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(BASE_DIR, '..', 'data', 'dataset.csv')
 
 def main():
     parser = argparse.ArgumentParser(description="Train Phishing Detection Models")
@@ -67,7 +69,7 @@ def main():
     print("\n--- Final Results ---")
     results_df = pd.DataFrame(trainer.results).T
     print(results_df)
-    results_df.to_csv('../docs/results_summary.csv')
+    results_df.to_csv(os.path.join(BASE_DIR, '..', 'docs', 'results_summary.csv'))
 
 if __name__ == "__main__":
     main()
