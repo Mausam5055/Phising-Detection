@@ -2,3 +2,7 @@ pandas
 numpy
 scikit-learn
 tensorflow
+flask
+requests
+beautifulsoup4
+joblib

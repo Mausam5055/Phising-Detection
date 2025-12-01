@@ -44,4 +44,4 @@ def preprocess_data(df):
     imputer = SimpleImputer(strategy='mean')
     X_scaled = imputer.fit_transform(X_scaled)
 
-    return X_scaled.astype(np.float32), y.astype(np.float32)
+    return X_scaled.astype(np.float32), y.astype(np.float32), scaler, imputer

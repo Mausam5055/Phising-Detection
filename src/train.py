@@ -7,9 +7,15 @@ from preprocessing import load_data, preprocess_data
 from models import ModelTrainer
 from sklearn.model_selection import train_test_split
 
+import joblib
+
 # Configuration
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, '..', 'data', 'dataset.csv')
+MODEL_DIR = os.path.join(BASE_DIR, '..', 'models_saved')
+
+if not os.path.exists(MODEL_DIR):
+    os.makedirs(MODEL_DIR)
 
 def main():
     parser = argparse.ArgumentParser(description="Train Phishing Detection Models")
@@ -29,9 +35,14 @@ def main():
     print(f"Loaded dataset with shape: {df.shape}")
 
     # 2. Preprocessing
-    X, y = preprocess_data(df)
+    X, y, scaler, imputer = preprocess_data(df)
     if X is None:
         return
+        
+    # Save Scaler and Imputer
+    joblib.dump(scaler, os.path.join(MODEL_DIR, 'scaler.pkl'))
+    joblib.dump(imputer, os.path.join(MODEL_DIR, 'imputer.pkl'))
+    print("Saved scaler and imputer.")
 
     # Split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -44,6 +55,16 @@ def main():
     # 3. Classical ML
     print("\n--- Classical ML ---")
     trainer.train_classical(X_train, y_train, X_test, y_test)
+    
+    # Save Random Forest (Best Performer)
+    # Note: We need to access the model object. train_classical doesn't return it.
+    # We will re-train it here or modify ModelTrainer. 
+    # For simplicity, let's just re-train and save RF here as it's fast.
+    from sklearn.ensemble import RandomForestClassifier
+    rf = RandomForestClassifier(n_estimators=100)
+    rf.fit(X_train, y_train)
+    joblib.dump(rf, os.path.join(MODEL_DIR, 'rf_model.pkl'))
+    print("Saved Random Forest model.")
 
     # 4. Deep Learning
     print("\n--- Deep Learning ---")
